@@ -45,4 +45,6 @@ public class Employer extends User {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+
+
 }
