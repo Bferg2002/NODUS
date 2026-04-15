@@ -1,4 +1,4 @@
-package com.workforce.pipeline.model;
+package main.java.com.workforce.pipeline.model;
 
 public class Employer {
 }
