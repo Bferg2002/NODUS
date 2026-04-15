@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
+}
+
+:root{
+ --bg-primary: #020d1a; 
+ --bg-secondary: #051525;
+ --bg-card: rgba(0, 210, 255, 0.06);
+ --acent-cyan: #00d2ff;
+--accent-cyan-glow: #00ffcc;
+--accent-violet: #c472f0;
+--grid-line: #00ffcc;
+--text-primary: #ffffff;
+--text-secondary: rgba(255,255,255,0.6);
+--text-muted: rgba(225, 255, 255, 0.35);
+--border-card: rgba(0,210,255,0.25);
+--font-display: 'Syne', sans-serif;
+--font-ui: 'Space Groresk', sans-serif;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a{
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+button{
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+input, textarea, select{
+  font-family: var(--font-ui);
+}
