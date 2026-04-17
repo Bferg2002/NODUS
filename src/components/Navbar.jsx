@@ -18,6 +18,7 @@ export default function Navbar() {
                     {/* logged in links */}
                     <Link to="/search">Search</Link>
                     <Link to="/directory">Directory</Link>
+                    <Link to="/profile">Profile</Link>
                     <span>{user.name}</span>
                     <button onClick={handleLogout}>Logout</button>
                 </div>
