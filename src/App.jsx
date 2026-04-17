@@ -1,7 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './router/ProtectedRoute'
-
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 const Placeholder = ({ name }) => (
   <div style={{ color: 'white', padding: '2rem' }}>{name} page</div>
 )
@@ -12,8 +13,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Placeholder name="Landing" />} />
-        <Route path="/login" element={<Placeholder name="Login" />} />
-        <Route path="/register" element={<Placeholder name="Register" />} />
+        <Route path="/login" element={<LoginPage />} />
+<Route path="/register" element={<RegisterPage />} />
         
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Placeholder name="Dashboard" />} />
