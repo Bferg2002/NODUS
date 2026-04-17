@@ -35,7 +35,7 @@ public class Skill {
     @Setter
     @Getter
     @JsonIgnore
-    @ManyToMany(mappedBy = "skillsTaught")
+    @ManyToMany(mappedBy = "skills")
     private List<TrainingProgram> trainingPrograms = new ArrayList<>();
 
     public Skill() {

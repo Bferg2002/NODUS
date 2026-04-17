@@ -51,14 +51,15 @@ public class TrainingController {
     }
 
     // ----------------------------
-    // DELETE PROGRAM
+    // DELETE PROGRAM (returns deleted object for testing visibility)
+    // ----------------------------
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
         trainingService.deleteProgram(id);
     }
 
     // ----------------------------
-    // ADD SKILL (STANDARDIZED LIKE JOBS)
+    // ADD SKILL TO PROGRAM (STANDARDIZED PATTERN)
     // ----------------------------
     @PostMapping("/{programId}/skills")
     public TrainingProgram addSkill(@PathVariable int programId,
@@ -67,7 +68,7 @@ public class TrainingController {
     }
 
     // ----------------------------
-    // REMOVE SKILL (RETURN UPDATED PROGRAM)
+    // REMOVE SKILL FROM PROGRAM
     // ----------------------------
     @DeleteMapping("/{programId}/skills/{skillId}")
     public TrainingProgram removeSkill(@PathVariable int programId,

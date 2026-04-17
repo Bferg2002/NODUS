@@ -21,13 +21,16 @@ public class TrainingProgram {
     @Getter
     private String description;
 
-    @ManyToMany
+    // ----------------------------
+    // MANY-TO-MANY: TrainingProgram ↔ Skill
+    // ----------------------------
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "training_program_skill",
             joinColumns = @JoinColumn(name = "training_program_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-    private List<Skill> skillsTaught = new ArrayList<>();
+    private List<Skill> skills = new ArrayList<>();
 
     public TrainingProgram() {}
 
@@ -36,18 +39,32 @@ public class TrainingProgram {
         this.description = description;
     }
 
+    // ----------------------------
+    // ADD SKILL TO PROGRAM
+    // ----------------------------
     public void addSkill(Skill skill) {
-        skillsTaught.add(skill);
+        if (!skills.contains(skill)) {
+            skills.add(skill);
+        }
     }
 
+    // ----------------------------
+    // REMOVE SKILL FROM PROGRAM
+    // ----------------------------
     public void removeSkill(Skill skill) {
-        skillsTaught.remove(skill);
+        skills.remove(skill);
     }
 
-    public List<Skill> getSkillsTaught() {
-        return new ArrayList<>(skillsTaught);
+    // ----------------------------
+    // GET SKILLS (RETURN LIVE LIST FOR JPA)
+    // ----------------------------
+    public List<Skill> getSkills() {
+        return skills;
     }
 
+    // ----------------------------
+    // SETTERS
+    // ----------------------------
     public void setName(String name) {
         this.name = name;
     }

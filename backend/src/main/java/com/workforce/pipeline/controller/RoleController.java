@@ -52,7 +52,7 @@ public class RoleController {
         return roleService.updateRole(id, role);
     }
 
-    // REFRESH DEMAND
+    // 🔥 DEMAND SCORE (THIS REPLACES USER INPUT)
     @PutMapping("/{id}/refresh-demand")
     public Role refreshDemandScore(@PathVariable Integer id) {
         return roleService.refreshDemandScore(id);
@@ -60,7 +60,7 @@ public class RoleController {
 
     // DELETE
     @DeleteMapping("/{id}")
-    public void deleteRole(@PathVariable Integer id) {
-        roleService.deleteRole(id);
+    public boolean deleteRole(@PathVariable Integer id) {
+        return roleService.deleteRole(id);
     }
 }

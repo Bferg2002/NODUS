@@ -57,7 +57,7 @@ public class TrainingService {
 
         if (program == null || skill == null) return null;
 
-        program.getSkillsTaught().add(skill);
+        program.getSkills().add(skill);
         return trainingRepository.save(program);
     }
 
@@ -66,7 +66,7 @@ public class TrainingService {
         TrainingProgram program = trainingRepository.findById(programId).orElse(null);
         if (program == null) return null;
 
-        program.getSkillsTaught().removeIf(skill -> skill.getId() == skillId);
+        program.getSkills().removeIf(skill -> skill.getId() == skillId);
         return trainingRepository.save(program);
     }
 }
