@@ -9,6 +9,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ public class Role {
     private String title;     // ADD THIS
     private String region;
     private String industry;
-    private double demandScore;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private double demandScore = 0.0;
 
     @JsonIgnore
     @OneToMany(mappedBy = "role")

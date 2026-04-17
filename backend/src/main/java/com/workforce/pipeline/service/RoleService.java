@@ -1,6 +1,5 @@
 package com.workforce.pipeline.service;
 
-import com.workforce.pipeline.model.Job;
 import com.workforce.pipeline.model.Role;
 import com.workforce.pipeline.repository.JobRepository;
 import com.workforce.pipeline.repository.RoleRepository;
@@ -21,19 +20,25 @@ public class RoleService {
         this.jobRepository = jobRepository;
     }
 
+    // ✅ CREATE
     public Role createRole(Role role) {
+        // 🔥 CRITICAL: ignore client demandScore completely
         role.setDemandScore(0.0);
+
         return roleRepository.save(role);
     }
 
+    // READ ALL
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
 
+    // READ ONE
     public Role getRoleById(Integer id) {
         return roleRepository.findById(id).orElse(null);
     }
 
+    // SEARCH
     public List<Role> getRolesByRegion(String region) {
         return roleRepository.findByRegionIgnoreCase(region);
     }
@@ -42,10 +47,17 @@ public class RoleService {
         return roleRepository.findByIndustryIgnoreCase(industry);
     }
 
+    // ✅ UPDATE (FIXED PROPERLY)
     public Role updateRole(Integer id, Role updatedRole) {
 
         Role existing = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        // 🔥 DO NOT TOUCH demandScore
+
+        if (updatedRole.getTitle() != null) {
+            existing.setTitle(updatedRole.getTitle());
+        }
 
         if (updatedRole.getRegion() != null) {
             existing.setRegion(updatedRole.getRegion());
@@ -58,31 +70,27 @@ public class RoleService {
         return roleRepository.save(existing);
     }
 
+    // DELETE
     public boolean deleteRole(Integer id) {
         if (!roleRepository.existsById(id)) {
             return false;
         }
+
         roleRepository.deleteById(id);
         return true;
     }
 
-    @Transactional
+    // ✅ REFRESH DEMAND SCORE (THIS IS YOUR "AI SIMULATION")
     public Role refreshDemandScore(Integer roleId) {
+
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
+        // 🔥 COUNT jobs tied to this role
         double score = jobRepository.countByRole_Id(roleId);
 
         role.setDemandScore(score);
 
         return roleRepository.save(role);
-    }
-
-    public double calculateDemandScore(Role role) {
-        if (role.getId() == 0) {
-            return 0.0;
-        }
-
-        return jobRepository.findByRole_Id(role.getId()).size();
     }
 }

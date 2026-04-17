@@ -10,5 +10,4 @@ import java.util.List;
 public interface TrainingRepository extends JpaRepository<TrainingProgram, Integer> {
     List<TrainingProgram> findByNameContainingIgnoreCase(String name);
 
-    List<TrainingProgram> findBySkillsTaught_NameIgnoreCase(String skillName);
-}
+    List<TrainingProgram> findBySkills_NameIgnoreCase(String name);}
