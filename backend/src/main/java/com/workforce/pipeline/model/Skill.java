@@ -5,7 +5,6 @@ import com.workforce.pipeline.enums.DemandLevel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,7 @@ public class Skill {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Getter
     @Setter
     @Enumerated(EnumType.STRING)
     private DemandLevel demandLevel;
@@ -50,7 +50,7 @@ public class Skill {
         return this.name.equalsIgnoreCase(skill.getName());
     }
     // Placeholder until demand is computed through the service/repository layer.
-    public static DemandLevel getDemandLevel() {
+    public static DemandLevel calculateDemandLevel() {
         int jobCount = 20000;
 
         if (jobCount > 5000) {
