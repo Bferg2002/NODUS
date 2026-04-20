@@ -2,6 +2,7 @@ package com.workforce.pipeline.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,41 +26,86 @@ public class RecommendationService {
         try {
             String prompt = buildPrompt(userSkills, jobSkills, jobTitle);
 
+            // =========================
+            // REQUEST BODY
+            // =========================
             Map<String, Object> request = new HashMap<>();
             request.put("model", "gpt-4o-mini");
 
             request.put("messages", List.of(
-                    Map.of("role", "system",
-                            "content", "You are a workforce intelligence engine. You MUST return structured JSON only."),
-                    Map.of("role", "user", "content", prompt)
+                    Map.of(
+                            "role", "system",
+                            "content", "You are a workforce intelligence engine. Return ONLY valid JSON."
+                    ),
+                    Map.of(
+                            "role", "user",
+                            "content", prompt
+                    )
             ));
 
             request.put("temperature", 0.3);
 
-            String response = restTemplate.postForObject(
+            // =========================
+            // HEADERS (CRITICAL FOR AUTH)
+            // =========================
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + openaiApiKey);
+
+            HttpEntity<Map<String, Object>> entity =
+                    new HttpEntity<>(request, headers);
+
+            // =========================
+            // API CALL
+            // =========================
+            ResponseEntity<String> response = restTemplate.exchange(
                     "https://api.openai.com/v1/chat/completions",
-                    request,
+                    HttpMethod.POST,
+                    entity,
                     String.class
             );
 
-            return objectMapper.readValue(response, Map.class);
+            // =========================
+            // PARSE OPENAI RESPONSE
+            // =========================
+            Map<String, Object> fullResponse =
+                    objectMapper.readValue(response.getBody(), Map.class);
+
+            List<Map<String, Object>> choices =
+                    (List<Map<String, Object>>) fullResponse.get("choices");
+
+            Map<String, Object> message =
+                    (Map<String, Object>) choices.get(0).get("message");
+
+            String content = (String) message.get("content");
+
+            // =========================
+            // RETURN CLEAN JSON ONLY
+            // =========================
+            return objectMapper.readValue(content, Map.class);
 
         } catch (Exception e) {
-            throw new RuntimeException("AI recommendation failed", e);
+            e.printStackTrace();
+            throw new RuntimeException("AI recommendation failed: " + e.getMessage());
         }
     }
 
-    private String buildPrompt(List<String> userSkills,
-                               List<String> jobSkills,
-                               String jobTitle) {
+    // =========================
+    // PROMPT BUILDER
+    // =========================
+    private String buildPrompt(
+            List<String> userSkills,
+            List<String> jobSkills,
+            String jobTitle
+    ) {
 
         return """
         You are an explainable workforce intelligence system.
 
         TASK:
-        Analyze job match and skill gaps.
+        Compare user skills vs job requirements and produce a structured analysis.
 
-        OUTPUT MUST BE VALID JSON:
+        OUTPUT MUST BE VALID JSON ONLY (no markdown, no text):
 
         {
           "matchScore": number,
@@ -78,9 +124,9 @@ public class RecommendationService {
         %s
 
         RULES:
-        - Be specific
-        - No generic advice
-        - Explain real skill gaps
+        - Be precise
+        - No filler text
+        - Only output JSON
         """.formatted(userSkills, jobTitle, jobSkills);
     }
 }

@@ -5,9 +5,11 @@ import com.workforce.pipeline.repository.UserRepository;
 import com.workforce.pipeline.repository.JobRepository;
 import com.workforce.pipeline.model.User;
 import com.workforce.pipeline.model.Job;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/recommendations")
@@ -29,22 +31,75 @@ public class RecommendationController {
     @PostMapping("/generate")
     public Map<String, Object> generate(@RequestBody Map<String, Object> request) {
 
-        Integer userId = (Integer) request.get("userId");
-        Integer jobId = (Integer) request.get("jobId");
+        // =========================
+        // SAFE REQUEST PARSING
+        // =========================
+        Integer userId;
+        try {
+            userId = request.get("userId") == null
+                    ? null
+                    : Integer.parseInt(request.get("userId").toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid userId format");
+        }
 
-        User user = userRepository.findById(userId).orElseThrow();
-        Job job = jobRepository.findById(jobId).orElseThrow();
+        List<?> rawJobIds = (List<?>) request.get("jobIds");
 
+        if (userId == null) {
+            throw new RuntimeException("userId cannot be null");
+        }
+
+        if (rawJobIds == null || rawJobIds.isEmpty()) {
+            throw new RuntimeException("jobIds cannot be null or empty");
+        }
+
+        List<Integer> jobIds = rawJobIds.stream()
+                .map(id -> Integer.parseInt(id.toString()))
+                .toList();
+
+        // =========================
+        // DATABASE FETCH
+        // =========================
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+
+        List<Job> jobs = jobRepository.findAllWithSkills(jobIds);
+
+        if (jobs.isEmpty()) {
+            throw new RuntimeException("No jobs found for provided IDs");
+        }
+
+        // =========================
+        // SKILL EXTRACTION
+        // =========================
         List<String> userSkills = user.getSkills()
-                .stream().map(s -> s.getName()).toList();
+                .stream()
+                .map(skill -> skill.getName())
+                .collect(Collectors.toList());
 
-        List<String> jobSkills = job.getSkillsList()
-                .stream().map(s -> s.getName()).toList();
+        List<String> jobSkills = jobs.stream()
+                .flatMap(job -> job.getSkillsList().stream())
+                .map(skill -> skill.getName())
+                .distinct()
+                .collect(Collectors.toList());
 
-        return aiService.generateRecommendations(
+        String primaryJobTitle = jobs.get(0).getTitle();
+
+        // =========================
+        // AI CALL
+        // =========================
+        Map<String, Object> response = aiService.generateRecommendations(
                 userSkills,
                 jobSkills,
-                job.getTitle()
+                primaryJobTitle
         );
+
+        // =========================
+        // SAFE RESPONSE WRAP
+        // =========================
+        response.put("userId", userId);
+        response.put("jobCount", jobs.size());
+
+        return response;
     }
 }
