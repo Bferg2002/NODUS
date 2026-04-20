@@ -6,8 +6,8 @@ import java.util.List;
  * RecommendationDTO
  *
  * Purpose:
- * - Represents job recommendations for a specific user
- * - Will be used later for analytics / AI logic
+ * - Represents recommendation response data
+ * - Used by service/controller output
  */
 public class RecommendationDTO {
 
@@ -20,8 +20,6 @@ public class RecommendationDTO {
         this.userId = userId;
         this.recommendedJobs = recommendedJobs;
     }
-
-    // ===== Getters & Setters =====
 
     public Integer getUserId() {
         return userId;

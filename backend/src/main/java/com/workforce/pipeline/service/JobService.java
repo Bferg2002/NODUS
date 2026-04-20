@@ -86,12 +86,17 @@ public class JobService {
     public Job addSkillToJob(Integer jobId, Integer skillId) {
         Job job = jobRepository.findById(jobId).orElse(null);
         Skill skill = skillRepository.findById(skillId).orElse(null);
+
         if (job == null || skill == null) {
             return null;
         }
 
         boolean alreadyLinked = job.getSkillsList().stream()
-                .anyMatch(existingSkill -> existingSkill.getId() == skillId);
+                .anyMatch(existingSkill ->
+                        existingSkill.getId() != null &&
+                                existingSkill.getId().equals(skillId)
+                );
+
         if (!alreadyLinked) {
             job.addSkill(skill);
         }
@@ -105,13 +110,17 @@ public class JobService {
             return null;
         }
 
-        job.getSkillsList().removeIf(skill -> skill.getId() == skillId);
+        job.getSkillsList().removeIf(skill ->
+                skill.getId() != null && skill.getId().equals(skillId)
+        );
+
         return jobRepository.save(job);
     }
 
     public Job assignRoleToJob(Integer jobId, Integer roleId) {
         Job job = jobRepository.findById(jobId).orElse(null);
         Role role = roleRepository.findById(roleId).orElse(null);
+
         if (job == null || role == null) {
             return null;
         }
