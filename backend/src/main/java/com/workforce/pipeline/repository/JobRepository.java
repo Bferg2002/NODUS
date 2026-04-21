@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Integer> {
@@ -20,4 +21,6 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
 
     @Query("SELECT j FROM Job j LEFT JOIN FETCH j.skillsList WHERE j.id IN :ids")
     List<Job> findAllWithSkills(@Param("ids") List<Integer> ids);
+
+    Optional<Job> findByJobKey(String jobKey);
 }

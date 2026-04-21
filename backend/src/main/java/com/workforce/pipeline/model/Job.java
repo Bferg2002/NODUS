@@ -1,23 +1,14 @@
 package com.workforce.pipeline.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Setter
 @Getter
@@ -29,8 +20,10 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(columnDefinition = "TEXT")
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -38,7 +31,10 @@ public class Job {
 
     private String dataFreshness;
 
-    @ManyToMany
+    @Column(unique = true, length = 1000)
+    private String jobKey;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "job_skill",
             joinColumns = @JoinColumn(name = "job_id"),
@@ -46,7 +42,7 @@ public class Job {
     )
     private List<Skill> skillsList = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 
