@@ -1,5 +1,46 @@
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+
+function useCountUp(target, duration = 1000) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    let start = 0
+    const step = target / (duration / 16)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= target) {
+        setCount(target)
+        clearInterval(timer)
+      } else {
+        setCount(Math.floor(start))
+      }
+    }, 16)
+    return () => clearInterval(timer)
+  }, [target, duration])
+  return count
+}
+
+const STATS = [
+  { label: 'Active Searches', target: 3, color: '#00d2ff' },
+  { label: 'AI Recommendations', target: 7, color: '#c472f0' },
+  { label: 'Skills Matched', target: 12, color: '#00ffcc' },
+]
+
+function StatCard({ label, target, color }) {
+  const count = useCountUp(target)
+  return (
+    <div style={{
+      background: 'rgba(0,210,255,0.03)',
+      border: '1px solid rgba(0,210,255,0.1)',
+      borderRadius: '12px',
+      padding: '1.25rem',
+    }}>
+      <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>{label}</p>
+      <p style={{ fontFamily: 'Syne, sans-serif', fontSize: '32px', fontWeight: 800, color, margin: 0 }}>{count}</p>
+    </div>
+  )
+}
 
 export default function JobSeekerDashboard() {
   const { user } = useAuth()
@@ -16,20 +57,8 @@ export default function JobSeekerDashboard() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-        {[
-          { label: 'Active Searches', value: '3', color: '#00d2ff' },
-          { label: 'AI Recommendations', value: '7', color: '#c472f0' },
-          { label: 'Skills Matched', value: '12', color: '#00ffcc' },
-        ].map(stat => (
-          <div key={stat.label} style={{
-            background: 'rgba(0,210,255,0.03)',
-            border: '1px solid rgba(0,210,255,0.1)',
-            borderRadius: '12px',
-            padding: '1.25rem',
-          }}>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '11px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>{stat.label}</p>
-            <p style={{ fontFamily: 'Syne, sans-serif', fontSize: '32px', fontWeight: 800, color: stat.color, margin: 0 }}>{stat.value}</p>
-          </div>
+        {STATS.map(stat => (
+          <StatCard key={stat.label} {...stat} />
         ))}
       </div>
 
