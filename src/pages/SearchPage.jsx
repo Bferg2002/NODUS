@@ -3,6 +3,41 @@ import { useAuth } from '../context/AuthContext'
 import { searchJobs } from '../services/jobService'
 import { getRecommendation } from '../services/recommendationService'
 import styles from './SearchPage.module.css'
+
+const AI_SECTIONS = ['VERDICT', 'WHAT YOU BRING', 'WHAT TO BUILD', 'DIFFERENTIATORS', 'YOUR PATH FORWARD', 'BOTTOM LINE']
+
+function AiResponseBody({ text }) {
+  if (!text) return null
+
+  const sectionRegex = new RegExp(`(${AI_SECTIONS.join('|')})`, 'g')
+  const parts = text.split(sectionRegex)
+
+  const hasAnySections = AI_SECTIONS.some(s => text.includes(s))
+  if (!hasAnySections) {
+    return <p className={styles.aiResponse}>{text}</p>
+  }
+
+  const elements = []
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i].trim()
+    if (!part) continue
+    if (AI_SECTIONS.includes(part)) {
+      elements.push(
+        <p key={i} style={{ fontFamily: 'Syne, sans-serif', fontSize: '11px', fontWeight: 700, color: '#c472f0', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '1rem 0 4px' }}>
+          {part}
+        </p>
+      )
+    } else {
+      elements.push(
+        <p key={i} className={styles.aiResponse} style={{ margin: '0 0 4px' }}>
+          {part}
+        </p>
+      )
+    }
+  }
+  return <div>{elements}</div>
+}
+
 export default function SearchPage() {
   const { user, skillProfile } = useAuth()
   const [query, setQuery] = useState('')
@@ -87,7 +122,7 @@ export default function SearchPage() {
     {recommendation && (
       <div className={styles.aiPanel}>
         <p className={styles.aiHeader}>✦ Nodus AI Analysis</p>
-        <p className={styles.aiResponse}>{recommendation.aiResponse}</p>
+        <AiResponseBody text={recommendation.aiResponse} />
       </div>
     )}
   </div>
